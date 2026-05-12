@@ -1,4 +1,7 @@
 function [objV, obj1, obj2, obj3, obj4] = objFun(phenotypes)
+% Función que calcula la carga de trabajo en la gestión de aviones por sectores.
+% Devuelve valores de objetivos para optimizar la sectorización con Voronoi.
+
 %objFun Evaluates the sectoring workload for aircraft management.
 %
 % Syntax:
@@ -29,29 +32,29 @@ function [objV, obj1, obj2, obj3, obj4] = objFun(phenotypes)
 % See also:
 %   complexityFunction, voronoi, std, mean
 
-% Load airspace dataset
+% Cargar datos del espacio aéreo guardados
 airspace = load(fullfile('data','airspace.mat'));
 
-% Number of phenotypes in the input list
+% Número de configuraciones a evaluar
 nPhenos = size(phenotypes,1);
 
-% Preallocate cost variables
+% Preparar variables para guardar los resultados
 objV = zeros(nPhenos, 1);
 obj1 = zeros(nPhenos, 1);
 obj2 = zeros(nPhenos, 1);
 obj3 = zeros(nPhenos, 1);
 obj4 = zeros(nPhenos, 1);
 
-% Compute costs on each dimension of the phenotype
+% Calcular costos para cada configuración
 for i=1:nPhenos
 
-    % Recover the voronoid structure from the current phenotype
+    % Convertir la configuración a puntos Voronoi
     vorxy = phenotype2vor(phenotypes(i,:));
     
     % Add boundary voronoi (this avoids infinite sectors near FIR)
     vor = [vorxy; airspace.vorBounds]; 
 
-    % Compute the complexity of each sector     
+    % Calcular la complejidad de cada sector
     comp = complexityFunction(vor, airspace);
     
     % Workload related to Background tasks: aircraft balance across sectors
@@ -63,7 +66,7 @@ for i=1:nPhenos
     % Workload related to Conflict tasks: total airway intersections
     obj4(i,1) = sum(comp.airwaysIntersections);
     
-    % Global objective: minimize airway intersections as main cost
+    % Objetivo principal: minimizar intersecciones de airways
     objV(i,1) = obj4(i,1);
 
 end

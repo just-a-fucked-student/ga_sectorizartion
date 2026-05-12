@@ -1,4 +1,7 @@
 function [MobjV, obj1, obj2, obj3, obj4] = MultiobjFun(phenotypes)
+% Función para calcular múltiples objetivos en la sectorización.
+% Devuelve dos objetivos: intersecciones y balance de aviones.
+
 %MultiobjFun Evaluates multiple objectives for sectorization.
 %
 % Syntax:
@@ -20,13 +23,13 @@ function [MobjV, obj1, obj2, obj3, obj4] = MultiobjFun(phenotypes)
 %   obj3   - Sector transfer balance metric.
 %   obj4   - Total airway intersections cost.
 
-% Load airspace dataset
+% Cargar datos del espacio aéreo
 airspace = load(fullfile('data','airspace.mat'));
 
-% Number of phenotypes in the input list
+% Número de configuraciones
 nPhenos = size(phenotypes,1);
 
-% Preallocate cost variables
+% Preparar variables para resultados
 MobjV = zeros(nPhenos, 2);
 obj1 = zeros(nPhenos, 1);
 obj2 = zeros(nPhenos, 1);
@@ -34,23 +37,21 @@ obj3 = zeros(nPhenos, 1);
 obj4 = zeros(nPhenos, 1);
 
 for i = 1:nPhenos
-    % Recover the voronoid structure from the current phenotype
+    % Convertir configuración a puntos Voronoi
     vorxy = phenotype2vor(phenotypes(i,:));
-    % Add boundary voronoi (this avoids infinite sectors near FIR)
+    % Agregar límites para evitar sectores infinitos
     vor = [vorxy; airspace.vorBounds];
 
-    % Compute the complexity of each sector
+    % Calcular complejidad de sectores
     comp = complexityFunction(vor, airspace);
 
-    % Objectives for multi-objective optimization
+    % Calcular métricas de carga
     obj1(i,1) = std(comp.aircraftInSector);
     obj2(i,1) = std(comp.firTransfers);
     obj3(i,1) = std(comp.sectorTransfers);
     obj4(i,1) = sum(comp.airwaysIntersections);
 
-    % Multi-objective vector:
-    %   1) minimize airway intersections
-    %   2) minimize aircraft distribution imbalance
+    % Vector de dos objetivos: intersecciones y balance de aviones
     MobjV(i,:) = [obj4(i,1), obj1(i,1)];
 end
 
