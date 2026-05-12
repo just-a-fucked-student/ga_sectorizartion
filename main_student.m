@@ -1,4 +1,4 @@
-﻿%% SECTION 1: CLEAR WORKSPACE
+%% SECTION 1: CLEAR WORKSPACE
 close all
 clear
 clc
@@ -144,3 +144,4 @@ disp(struct2table(comp));
 fprintf('ALL DONE!\n');
 fprintf('------------------------------------------------------------\n');
 
+eric
