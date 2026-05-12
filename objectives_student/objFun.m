@@ -54,31 +54,17 @@ for i=1:nPhenos
     % Compute the complexity of each sector     
     comp = complexityFunction(vor, airspace);
     
-    % Normalize complexity data 
-    % ...
+    % Workload related to Background tasks: aircraft balance across sectors
+    obj1(i,1) = std(comp.aircraftInSector);
+    % Workload related to Transition tasks: FIR transfer balance
+    obj2(i,1) = std(comp.firTransfers);
+    % Workload related to Recurring tasks: airway-sector transfer balance
+    obj3(i,1) = std(comp.sectorTransfers);
+    % Workload related to Conflict tasks: total airway intersections
+    obj4(i,1) = sum(comp.airwaysIntersections);
     
-    % Define single objective functions: 
-    %   Standard deviations of each type of workload
-    %
-    % Logic:
-    % Ex: minimize variance of aircraft/sec == all sectors same aircrafts
-    % Ex: minimize sum() of intersect == less interections overall
-    %
-    % Workload related to Background tasks 
-    obj1(i,1) = ;
-    % Workload related to Transition tasks
-    obj2(i,1) = ;
-    % Workload related to Recurring tasks
-    obj3(i,1) = ;
-    % Workload related to Conflict tasks
-    obj4(i,1) = ;
-    
-    % Check if your objective functions are well normalized
-    % ...
-    
-    % Define global objective function
-    
-    objV(i,1) = ; 
+    % Global objective: minimize airway intersections as main cost
+    objV(i,1) = obj4(i,1);
 
 end
 
