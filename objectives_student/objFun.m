@@ -63,8 +63,8 @@ for i=1:nPhenos
     obj2(i,1) = std(comp.firTransfers);
     % Workload related to Recurring tasks: airway-sector transfer balance
     obj3(i,1) = std(comp.sectorTransfers);
-    % Workload related to Conflict tasks: total airway intersections
-    obj4(i,1) = sum(comp.airwaysIntersections);
+    % Workload related to Conflict tasks: RSD de total airway intersections
+    obj4(i,1) = std(comp.airwaysIntersections) / (mean(comp.airwaysIntersections)+1e-6);
     
     % Objetivo principal: minimizar intersecciones de airways
     objV(i,1) = obj4(i,1);
