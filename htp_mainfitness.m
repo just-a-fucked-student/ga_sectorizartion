@@ -2,10 +2,10 @@
 %% SECTION 8: HYPER-PARAMETER TUNING (WP2)
 fprintf('Iniciant Hyper-Parameter Tuning...\n');
 
-% Llistes de paràmetres a provar (modifica-ho segons el que vulguis esperar)
-PS_list = [10, 20, 30];       % Provarem 3 mides de població
-MaxGen_list = [10, 20, 30];   % Provarem 3 màxims de generacions
-MC_hpt = 150;                 % El teu N ideal estabilitzat
+% Llistes de paràmetres a provar
+PS_list = [10, 20, 30];       
+MaxGen_list = [10, 20, 30];   
+MC_hpt = 150;                 
 
 % Matriu per guardar les mitjanes dels resultats finals
 mean_fitness_matrix = zeros(length(MaxGen_list), length(PS_list));
@@ -23,7 +23,7 @@ for i = 1:length(MaxGen_list)
 
         % Recalcular paràmetres derivats per a l'AGA segons aquesta Població (np)
         ne = 2; % Elits
-        nm = round(np * 0.3); % Mutants (30% per defecte, comprova els teus apunts)
+        nm = round(np * 0.3); % Mutants (30%)
         nn = round(np * 0.1); % Nous (10%)
         na = round(np * 0.4); % Pares (40%)
 

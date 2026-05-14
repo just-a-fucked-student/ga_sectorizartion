@@ -1,7 +1,7 @@
 %% Codi de la part del estudi de convergencia, el guardem aqui per no perdre'l i fer neteja al main
 fprintf('Iniciant l''estudi de convergència Monte Carlo...\n');
 
-M_iter = 200; % 20 repeticions per al toy example
+M_iter = 200;
 fitxer_mc = 'data/mc_checkpoint.txt';
 costos_MC = zeros(M_iter, 1);
 k_inici = 0;
@@ -22,13 +22,12 @@ end
 % 2. Paràmetres fixes per a l'estudi de convergència
 np = 20; % Population Size de prova
 ng = 15; % Max Generations de prova
-% ATENCIÓ: Has de calcular les fraccions aquí de nou si no estan globals
 ne = 2; % Número d'elits
 nm = round(np * 0.3); % Mutants
 nn = round(np * 0.1); % Nous
 na = round(np * 0.4); % Pares (Crossover)
 
-% 3. Obrir el fitxer per escriure al final de l'arxiu (mode 'append')
+% 3. Obrir el fitxer per escriure al final de l'arxiu
 fid = fopen(fitxer_mc, 'a');
 
 for k = (k_inici + 1):M_iter
@@ -58,7 +57,7 @@ for k = 1:M_iter
     if k > 1
         std_cost(k) = std(costos_MC(1:k));
     else
-        std_cost(k) = 0; % La std d'un sol element és 0
+        std_cost(k) = 0; 
     end
 end
 
