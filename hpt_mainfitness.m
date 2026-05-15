@@ -1,4 +1,4 @@
-%Codi HTP per guardar-lo i netejar el main per poder fer Run 
+%Codi HPT per guardar-lo i netejar el main per poder fer Run 
 %% SECTION 8: HYPER-PARAMETER TUNING (WP2)
 fprintf('Iniciant Hyper-Parameter Tuning...\n');
 
