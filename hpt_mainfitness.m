@@ -2,10 +2,9 @@
 %% SECTION 8: HYPER-PARAMETER TUNING (WP2)
 fprintf('Iniciant Hyper-Parameter Tuning...\n');
 
-% Llistes de paràmetres a provar
-PS_list = [10, 20, 30];       
-MaxGen_list = [10, 20, 30];   
-MC_hpt = 150;                 
+PS_list = [10, 20, 30, 40, 50, 60];       
+MaxGen_list = [10, 20, 30, 40, 50, 60];   
+MC_hpt = 100;                 
 
 % Matriu per guardar les mitjanes dels resultats finals
 mean_fitness_matrix = zeros(length(MaxGen_list), length(PS_list));
@@ -77,6 +76,6 @@ fprintf('Amb un cost mitjà de: %.4f\n', min_val);
 
 %Resultats HPT:
 %LA MILLOR CONFIGURACIÓ ÉS:
-%Population (PS) = 30
-%Max Generations = 30
-%Cost mitjà de: 0.1906
+%Population (PS) = 60
+%Max Generations = 60
+%Amb un cost mitjà de: 0.1340

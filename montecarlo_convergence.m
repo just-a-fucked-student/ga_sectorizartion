@@ -20,8 +20,8 @@ if exist(fitxer_mc, 'file') == 2
 end
 
 % 2. Paràmetres fixes per a l'estudi de convergència
-np = 20; % Population Size de prova
-ng = 15; % Max Generations de prova
+np = 30; % Population Size de prova
+ng = 30; % Max Generations de prova
 ne = 2; % Número d'elits
 nm = round(np * 0.3); % Mutants
 nn = round(np * 0.1); % Nous
