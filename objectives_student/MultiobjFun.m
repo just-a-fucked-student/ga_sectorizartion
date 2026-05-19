@@ -1,35 +1,8 @@
-function [MobjV, obj1, obj2, obj3, obj4] = MultiobjFun(phenotypes)
-% Función para calcular múltiples objetivos en la sectorización.
-% Devuelve dos objetivos: intersecciones y balance de aviones.
-
-%MultiobjFun Evaluates multiple objectives for sectorization.
-%
-% Syntax:
-%   [MobjV, obj1, obj2, obj3, obj4] = MultiobjFun(phenotypes)
-%
-% Description:
-%   This function computes a bi-objective cost for a set of phenotypes.
-%   It returns both the airway intersections cost and a workload balance
-%   metric to be used by a multi-objective GA.
-%
-% Inputs:
-%   phenotypes - A matrix where each row represents a set of coordinates
-%                alternating between longitudes and latitudes.
-%
-% Outputs:
-%   MobjV - Matrix of objective values [nPhenotypes x 2].
-%   obj1   - Aircraft distribution balance metric.
-%   obj2   - FIR transfer balance metric.
-%   obj3   - Sector transfer balance metric.
-%   obj4   - Total airway intersections cost.
-
-% Cargar datos del espacio aéreo
-airspace = load(fullfile('data','airspace.mat'));
-
-% Número de configuraciones
+function [MobjV, obj1, obj2, obj3, obj4] = MultiobjFun(phenotypes, airspace)
+% Número de configuracions (individus)
 nPhenos = size(phenotypes,1);
 
-% Preparar variables para resultados
+% Preparar variables per a resultats
 MobjV = zeros(nPhenos, 2);
 obj1 = zeros(nPhenos, 1);
 obj2 = zeros(nPhenos, 1);
@@ -37,23 +10,20 @@ obj3 = zeros(nPhenos, 1);
 obj4 = zeros(nPhenos, 1);
 
 for i = 1:nPhenos
-    % Convertir configuración a puntos Voronoi
+    % Convertir configuració a punts Voronoi
     vorxy = phenotype2vor(phenotypes(i,:));
-    % Agregar límites para evitar sectores infinitos
     vor = [vorxy; airspace.vorBounds];
 
-    % Calcular complejidad de sectores
+    % Calcular complexitat de sectors
     comp = complexityFunction(vor, airspace);
 
-    % Calcular métricas de carga
-    obj1(i,1) = std(comp.aircraftInSector);
-    obj2(i,1) = std(comp.firTransfers);
-    obj3(i,1) = std(comp.sectorTransfers);
-    obj4(i,1) = sum(comp.airwaysIntersections);
+    % MÈTRIQUES EN RSD (Fonamental per a gamultiobj!)
+    obj1(i,1) = std(comp.aircraftInSector) / (mean(comp.aircraftInSector) + 1e-6);
+    obj2(i,1) = std(comp.firTransfers) / (mean(comp.firTransfers) + 1e-6);
+    obj3(i,1) = std(comp.sectorTransfers) / (mean(comp.sectorTransfers) + 1e-6);
+    obj4(i,1) = std(comp.airwaysIntersections) / (mean(comp.airwaysIntersections) + 1e-6);
 
-    % Vector de dos objetivos: intersecciones y balance de aviones
+    % Definim els dos objectius: [Conflictes (obj4), Avions (obj1)]
     MobjV(i,:) = [obj4(i,1), obj1(i,1)];
 end
-
 end
-
