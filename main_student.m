@@ -136,7 +136,43 @@ disp(struct2table(comp));
 
 %% SECTION 7: FUTURE WORK PACKAGE 3
 % Placeholder para comparación GA MATLAB y análisis adicionales.
+fprintf('\nMULTI-OBJECTIVE GA (WP3) ---\n');
+FitnessFunction = @(x) MultiobjFun(x);
+options = optimoptions('gamultiobj', ...
+    'PopulationSize', PS, ...
+    'MaxGenerations', MaxGen, ...
+    'CrossoverFraction', CF, ...
+    'ParetoFraction', PF, ...
+    'UseVectorized', true, ...    
+    'Display', 'iter', ...
+    'PlotFcn', @gaplotpareto);
+fprintf('Ejecutando gamultiobj...\n');
+[x_pareto, fval_pareto, exitflag, output] = gamultiobj(FitnessFunction, NVAR, ...
+    [], [], [], [], LB, UB, [], options);
+fprintf('Optimización Multi-Objetivo Completada.\n');
+fprintf('Número de soluciones en el Frente de Pareto: %d\n', size(x_pareto, 1));
 
+distances = sqrt(fval_pareto(:,1).^2 + fval_pareto(:,2).^2);
+[~, best_idx] = min(distances);
+
+best_multi_phenotype = x_pareto(best_idx, :);
+best_multi_fval = fval_pareto(best_idx, :);
+
+fprintf('\nSolución equilibrada seleccionada (índice %d):\n', best_idx);
+fprintf('  Intersecciones Totales: %.2f\n', best_multi_fval(1));
+fprintf('  Desviación Estándar de Aviones: %.2f\n', best_multi_fval(2));
+
+figure('Name', 'Sectorización - Solución Multi-Objetivo (WP3)');
+ah_multi = plotAirspace(airspace);
+
+vorxy_multi = phenotype2vor(best_multi_phenotype);
+vorxyB_multi = [vorxy_multi; airspace.vorBounds]; 
+plotVoronoiSectors(ah_multi, vorxy_multi(:,1), vorxy_multi(:,2), airspace);
+
+[~, obj1, obj2, obj3, obj4] = MultiobjFun(best_multi_phenotype);
+fprintf('\n--- Desglose de la solución elegida ---\n');
+fprintf('Balance de aviones (std): %.2f\n', obj1);
+fprintf('Intersecciones (sum): %.2f\n', obj4);
 %% SECTION 8: FUTURE WORK PACKAGE 4
 % Placeholder para Monte-Carlo y multiobjetivo.
 
