@@ -156,29 +156,46 @@ fprintf('Executant gamultiobj (FINESTRA 1: Gràfiques d''evolució)...\n');
 
 fprintf('Optimització Multi-Objectiu Completada.\n');
 
-%% 3. SELECCIÓ I DIBUIX DE LA SECTORITZACIÓ (FINESTRA 2)
-% Calcular la solució més equilibrada (més propera al 0,0)
+%% 3. SELECCIÓ I DIBUIX DE LES 3 SOLUCIONS DEL PARETO (WP3 Final)
+
+% 1. Ordenem el Front de Pareto basant-nos en l'Objectiu 1 (eix X)
+[~, sort_idx] = sort(fval_pareto(:,1));
+
+% Extraiem els índexs de les tres solucions clau
+idx_C = sort_idx(1);       % Extrem Esquerre: Millor per Obj 1, Pitjor per Obj 2
+idx_A = sort_idx(end);     % Extrem Dret: Pitjor per Obj 1, Millor per Obj 2
+
+% Solució B (Centre equilibrat)
 distances = sqrt(fval_pareto(:,1).^2 + fval_pareto(:,2).^2);
-[~, best_idx] = min(distances);
+[~, idx_B] = min(distances);
 
-best_multi_phenotype = x_pareto(best_idx, :);
-best_multi_fval = fval_pareto(best_idx, :);
+fprintf('\n--- GENERANT LES 3 SOLUCIONS DEL PARETO ---\n');
 
-% Mostrar per consola el resultat guanyador
-fprintf('\nSolució equilibrada seleccionada (índex %d):\n', best_idx);
-fprintf('  Interseccions de rutes (RSD): %.4f\n', best_multi_fval(1));
-fprintf('  Balanç d''avions (RSD): %.4f\n', best_multi_fval(2));
+% --- SOLUCIÓ A (Extrem Dret - Focus en Interseccions) ---
+ahA = plotAirspace(airspace); 
+hold(ahA, 'on');
+vorxyA = phenotype2vor(x_pareto(idx_A, :));
+plotVoronoiSectors(ahA, vorxyA(:,1), vorxyA(:,2), airspace);
+title(ahA, 'Solution A (Right Extremity - Area/Intersections Focused)', 'FontSize', 12);
+set(ahA.Parent, 'Name', 'Solution A'); % Li posem nom a la finestra directament
 
-ah_multi = plotAirspace(airspace); % Això ja obre la finestra sola
-hold(ah_multi, 'on');
+% --- SOLUCIÓ B (Centre - Equilibrat) ---
+ahB = plotAirspace(airspace); 
+hold(ahB, 'on');
+vorxyB = phenotype2vor(x_pareto(idx_B, :));
+plotVoronoiSectors(ahB, vorxyB(:,1), vorxyB(:,2), airspace);
+title(ahB, 'Solution B (Knee Point - Balanced)', 'FontSize', 12);
+set(ahB.Parent, 'Name', 'Solution B');
 
-% Obtenir les coordenades i dibuixar els sectors Voronoi
-vorxy_multi = phenotype2vor(best_multi_phenotype);
-plotVoronoiSectors(ah_multi, vorxy_multi(:,1), vorxy_multi(:,2), airspace);
+% --- SOLUCIÓ C (Extrem Esquerre - Focus en Trànsit) ---
+ahC = plotAirspace(airspace); 
+hold(ahC, 'on');
+vorxyC = phenotype2vor(x_pareto(idx_C, :));
+plotVoronoiSectors(ahC, vorxyC(:,1), vorxyC(:,2), airspace);
+title(ahC, 'Solution C (Left Extremity - Traffic Focused)', 'FontSize', 12);
+set(ahC.Parent, 'Name', 'Solution C');
 
-title('Airspace Sectoring', 'FontSize', 14);
-
-fprintf('\nTODO HECHO!\n');
+fprintf('Les tres figures s''han generat correctament!\n');
 
 %% ALL DONE
 
