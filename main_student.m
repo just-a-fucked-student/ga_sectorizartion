@@ -53,7 +53,7 @@ LB = repmat([axisBounds(1), axisBounds(3)], 1, NSECT); % Límites inferiores
 UB = repmat([axisBounds(2), axisBounds(4)], 1, NSECT); % Límites superiores
 
 % Máximo número de generaciones
-MaxGen = 15;
+MaxGen = 30;
 
 % Tamaño de población
 PS = 30;
@@ -100,8 +100,11 @@ nn = round(np * NF); % Número de nuevos
 na = round(np * CF); % Número de padres
 n = NSECT; % Tamaño del fenotipo (número de sectores Voronoi)
 
-% Resolver con AGA
+% Resolver con AGA (con cronometraje para comparar con el toolbox)
+tic;
 res = aga(goal, ng, np, ne, nm, nn, na, objFun1D, LB, UB);
+tAGA = toc;
+fprintf('AGA finalizado en %.2f s | best cost = %.4f\n', tAGA, res.bestfit);
 
 % Solución
 phenotype = res.bestind; % Mejor fenotipo
@@ -132,7 +135,67 @@ disp(vorxy);
 disp('Complejidad:');
 disp(struct2table(comp));
 
+%% SECTION 6: GA TOOLBOX OPTIMISATION (Matlab built-in ga)
+% Mismo problema, mismo coste (RSD de airway intersections), 
+% pero ahora con el GA del Global Optimization Toolbox para comparar.
+fprintf('\nSINGLE-OBJECTIVE GA (Matlab toolbox) ---------------------\n');
 
+% Reutilizamos objFun: ga solo lee la primera salida (objV) 
+ga_objFun = @(x) objFun(x);
+
+% Opciones equivalentes a las del AGA para que la comparación sea justa:
+% misma PS, misma MaxGen, mismo CrossoverFraction, mismo EliteCount.
+% (El GA toolbox no tiene MF ni NC explícitos: los mutantes salen 
+%  automáticamente del resto de la población tras elites y crossover.)
+ga_opts = optimoptions('ga', ...
+    'PopulationSize',    PS, ...
+    'MaxGenerations',    MaxGen, ...
+    'CrossoverFraction', CF, ...
+    'EliteCount',        EC, ...
+    'Display',           'iter', ...
+    'UseVectorized',     true, ...
+    'PlotFcn',           {@gaplotbestf});
+
+% Lanzar el GA del toolbox con cronómetro
+tic;
+[x_ga, fval_ga, exitflag_ga, output_ga] = ga(ga_objFun, NVAR, ...
+    [], [], [], [], LB, UB, [], ga_opts);
+tGA = toc;
+
+fprintf('GA toolbox finalizado en %.2f s | best cost = %.4f\n', tGA, fval_ga);
+
+%% SECTION 7: OPTIMISATION RESULTS OF GA TOOLBOX
+% Reconstruir la sectorización a partir del mejor fenotipo del toolbox
+vorxy_ga  = phenotype2vor(x_ga);
+vorxyB_ga = [vorxy_ga; airspace.vorBounds];
+comp_ga   = complexityFunction(vorxyB_ga, airspace);
+
+% Plot en figura nueva para no machacar el del AGA
+ah_ga = plotAirspace(airspace);
+plotVoronoiSectors(ah_ga, vorxy_ga(:,1), vorxy_ga(:,2), airspace);
+title(ah_ga, sprintf('GA toolbox  -  cost = %.3f', fval_ga));
+
+fprintf('Mejor individuo (GA toolbox):\n');
+disp(vorxy_ga);
+fprintf('Complejidad por sector (GA toolbox):\n');
+disp(struct2table(comp_ga));
+
+%% ===== AGA vs GA TOOLBOX: TABLA COMPARATIVA =====
+fprintf('\n========== COMPARATIVA AGA vs GA TOOLBOX ==========\n');
+fprintf('%-25s | %-12s | %-12s\n', 'Métrica', 'AGA', 'GA toolbox');
+fprintf('%s\n', repmat('-', 1, 55));
+fprintf('%-25s | %-12.4f | %-12.4f\n', 'Best cost (RSD AwyInt)', res.bestfit, fval_ga);
+fprintf('%-25s | %-12.2f | %-12.2f\n', 'Tiempo [s]',             tAGA,        tGA);
+fprintf('%-25s | %-12s | %-12s\n',     'Aircraft per sector', ...
+    mat2str(comp.aircraftInSector(:)'),   mat2str(comp_ga.aircraftInSector(:)'));
+fprintf('%-25s | %-12s | %-12s\n',     'AwyInt per sector', ...
+    mat2str(comp.airwaysIntersections(:)'), mat2str(comp_ga.airwaysIntersections(:)'));
+fprintf('%-25s | %-12s | %-12s\n',     'FIR transfers per sect', ...
+    mat2str(comp.firTransfers(:)'),       mat2str(comp_ga.firTransfers(:)'));
+fprintf('===================================================\n\n');
+
+
+return; % STOP AQUÍ PARA HACER LA COMPARATIVA AGA vs GA TOOLBOX ANTES DE SEGUIR CON EL WP3
 
 %% SECTION 10: MULTI-OBJECTIVE OPTIMIZATION (WP3)
 fprintf('\n--- MULTI-OBJECTIVE GA (WP3) ---\n');
