@@ -195,8 +195,6 @@ fprintf('%-25s | %-12s | %-12s\n',     'FIR transfers per sect', ...
 fprintf('===================================================\n\n');
 
 
-return; % STOP AQUÍ PARA HACER LA COMPARATIVA AGA vs GA TOOLBOX ANTES DE SEGUIR CON EL WP3
-
 %% SECTION 10: MULTI-OBJECTIVE OPTIMIZATION (WP3)
 fprintf('\n--- MULTI-OBJECTIVE GA (WP3) ---\n');
 
@@ -239,7 +237,7 @@ ahA = plotAirspace(airspace);
 hold(ahA, 'on');
 vorxyA = phenotype2vor(x_pareto(idx_A, :));
 plotVoronoiSectors(ahA, vorxyA(:,1), vorxyA(:,2), airspace);
-title(ahA, 'Solution A (Right Extremity - Area/Intersections Focused)', 'FontSize', 12);
+title(ahA, 'Solution A (Right Extremity - Traffic Focused)', 'FontSize', 12);
 set(ahA.Parent, 'Name', 'Solution A'); % Li posem nom a la finestra directament
 
 % --- SOLUCIÓ B (Centre - Equilibrat) ---
@@ -255,7 +253,7 @@ ahC = plotAirspace(airspace);
 hold(ahC, 'on');
 vorxyC = phenotype2vor(x_pareto(idx_C, :));
 plotVoronoiSectors(ahC, vorxyC(:,1), vorxyC(:,2), airspace);
-title(ahC, 'Solution C (Left Extremity - Traffic Focused)', 'FontSize', 12);
+title(ahC, 'Solution C (Left Extremity - Conflicts Focused)', 'FontSize', 12);
 set(ahC.Parent, 'Name', 'Solution C');
 
 fprintf('Les tres figures s''han generat correctament!\n');
